@@ -1,18 +1,21 @@
 # simplified_summarizer_api.py
 import os
-import base64
 import tempfile
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI, UploadFile, File, HTTPException, Form
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from gtts import gTTS
-import openai
+from openai import OpenAI
 import PyPDF2
 import docx
 from pydantic import BaseModel
 import requests
 
+
 # Environment setup
-openai.api_key = os.getenv("OPENAI_API_KEY")
+client = OpenAI(
+  api_key="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"
+)
 SIGN_API_URL = "https://your-sign-api.com/generate"  # Replace with actual API
 SIGN_API_KEY = os.getenv("SIGN_API_KEY")
 
@@ -48,26 +51,24 @@ def extract_text(file: UploadFile) -> str:
 def summarize_with_openai(text: str, num_sentences: int = 3) -> str:
     prompt = f"Summarize this text in {num_sentences} sentences:\n{text}"
     try:
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": "You are a summarization assistant."},
                 {"role": "user", "content": prompt}
             ]
         )
-        return response['choices'][0]['message']['content'].strip()
+        summary = response.choices[0].message.content.strip()
+        return summary
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"OpenAI error: {str(e)}")
 
-def text_to_speech(text: str) -> str:
+def text_to_speech_file(text: str) -> str:
     try:
         with tempfile.NamedTemporaryFile(delete=False, suffix='.mp3') as f:
             gtts = gTTS(text=text, lang='en')
             gtts.save(f.name)
-            with open(f.name, 'rb') as audio:
-                audio_base64 = base64.b64encode(audio.read()).decode('utf-8')
-            os.unlink(f.name)
-            return audio_base64
+            return f.name  # Return path to saved mp3
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"TTS error: {str(e)}")
 
@@ -89,7 +90,7 @@ def send_to_sign_api(text: str) -> dict:
 async def process_file(file: UploadFile = File(...), num_sentences: int = 3):
     text = extract_text(file)
     summary = summarize_with_openai(text, num_sentences)
-    audio = text_to_speech(summary)
+    audio = text_to_speech_file(summary)
     sign_response = send_to_sign_api(summary)
 
     return {
@@ -97,3 +98,13 @@ async def process_file(file: UploadFile = File(...), num_sentences: int = 3):
         "audio_base64": audio,
         "sign_language": sign_response
     }
+
+@app.post("/tts/")
+async def get_tts_audio(text: str = Form(...)):
+    file_path = text_to_speech_file(text)
+    return FileResponse(path=file_path, media_type='audio/mpeg', filename="summary.mp3")
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000) 
