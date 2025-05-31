@@ -76,8 +76,8 @@ export default function ChatPage() {
     // Add user message
     const userMessage = {
       id: Date.now().toString(),
-      role: "user" as const,
       content: input,
+      role: "user" as const,
       timestamp: new Date(),
     }
 
@@ -87,13 +87,14 @@ export default function ChatPage() {
 
     // Simulate AI response after a delay
     setTimeout(() => {
+      const lowerInput = input.toLowerCase().trim();
       const hasVideo =
         input.toLowerCase().includes("explain") ||
         input.toLowerCase().includes("how") ||
         input.toLowerCase().includes("what")
 
-      const hasQuiz =
-        input.toLowerCase().includes("test") || input.toLowerCase().includes("quiz") || Math.random() > 0.7 // Randomly add quizzes sometimes
+      // Only show quiz for chemistry question
+      const hasQuiz = lowerInput === "give me a chemistry question"
 
       const aiMessage = {
         id: (Date.now() + 1).toString(),
@@ -110,7 +111,18 @@ export default function ChatPage() {
   }
 
   const generateAIResponse = (userInput: string): string => {
-    // This is a placeholder. In a real app, this would call an actual AI service.
+    const lowerInput = userInput.toLowerCase().trim();
+    console.log('User input:', lowerInput); // Debug log
+    
+    if (lowerInput === "give me a chemistry question") {
+      return "Here's a chemistry question about global warming:\n\nWhat is the primary greenhouse gas responsible for global warming?\n\nA) Carbon Dioxide (CO2)\nB) Methane (CH4)\nC) Water Vapor (H2O)\nD) Nitrous Oxide (N2O)\n\nThe correct answer is A) Carbon Dioxide (CO2). While all of these are greenhouse gases, CO2 is the primary contributor to global warming due to its high concentration in the atmosphere and long atmospheric lifetime.";
+    }
+    
+    if (lowerInput === "tell me about the first battle of panipat in brief") {
+      return "The First Battle of Panipat, fought on April 21, 1526, was a decisive clash between Babur's Mughal forces and Ibrahim Lodi's Lodi Empire. Babur's victory resulted in the end of the Lodi dynasty and the establishment of the Mughal Empire in India. This battle is notable for being one of the earliest engagements involving gunpowder warfare in India, with Babur employing field artillery and firearms.\n\nKey aspects of the First Battle of Panipat:\nDate and Location: April 21, 1526, near the village of Panipat in present-day Haryana.\nBelligerents: Babur (Mughal Empire) vs. Ibrahim Lodi (Lodi Empire).\nOutcome: Babur's victory led to the end of the Lodi dynasty and the establishment of the Mughal Empire in India.\nSignificance: Marked the beginning of the Mughal period in India and introduced gunpowder warfare to the region.\nTactics: Babur's use of field artillery and gunpowder weaponry was a significant factor in his victory.";
+    }
+
+    // Default responses for other inputs
     const responses = [
       "That's a great question about this topic. Let me explain with a video I've generated for you.",
       "I've created a short video explanation that should help you understand this concept better.",
