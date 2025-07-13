@@ -68,7 +68,7 @@ This leads to **widening educational gaps**, reduced opportunities, and underrep
 
 ---
 
-> *EduBridge: Because learning should be a right, not a privilege.*
->
-> Demo video Link frontend - https://drive.google.com/file/d/1QX0cO_61rZsZjZroD1c_dneVKyW81WlZ/view?usp=drivesdk
-> Demo video link backend - https://drive.google.com/file/d/1QRSlOlMdS-c1mnzLF0Gj7gFMNmtpRFuo/view?usp=drivesdk
+### *EduBridge: Because learning should be a right, not a privilege.*
+
+- Demo video Link frontend - https://drive.google.com/file/d/1QX0cO_61rZsZjZroD1c_dneVKyW81WlZ/view?usp=drivesdk
+- Demo video link backend - https://drive.google.com/file/d/1QRSlOlMdS-c1mnzLF0Gj7gFMNmtpRFuo/view?usp=drivesdk
